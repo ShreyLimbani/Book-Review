@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+
+{% block title %}
+	Dashboard
+{% endblock %}
+
+{% block css %}
+	.book_card{
+		min-width:15px; max-width: 18rem; margin: 10px;
+	}
+{% endblock %}
+
+{% block body%}
+	
+	<section>
+  		<div class="container-fluid">
+  			<div class="row">
+  				<div class="col-lg-8 col-md-12 col-sm-12">
+  					<div class="row">
+  					<div class="col" style="font-size: 24px; margin-top: 10px;margin-bottom: 10px; text-align: center;color: white;">Few Books From Our Library</div>
+  					</div>
+  					<div class="row">
+  					{% for book in books %}
+  					<div class="col-lg-4 col-md-6 col-sm-6 align-self-center">
+  					<div class="card bg-light mb-3 book_card" style="background-color: transparent;opacity: 0.87;" >
+						<div class="card-header">
+							<h5><a href="{{ url_for('book', book_id=book.id) }} ">
+								{{ book.title }}
+							</a></h5>
+						</div>
+						<div class="card-body">
+						    <h6 class="card-title">ISBN ID : {{ book.isbn }}</h6>
+						    <p class="card-text">Author: {{ book.name }} </p>
+						    <p class="card-text">Year Published : {{ book.year }} </p>
+						</div>
+					</div>
+					</div>
+					{% endfor %}
+					</div>
+  				</div>
+  				<div class="col-lg-4 col-md-12 col-sm-12">
+  					<div class="row">
+  					<div class="col" style="font-size: 24px; margin-top: 10px;margin-bottom: 10px; text-align: center;color: white;">Books You've Reviewed</div>
+  					</div>
+  					<div class="row">
+  					{% for book in yourBooks %}
+  					<div class="col-lg-3 col-md-6 col-sm-6 align-self-center">
+  					<div class="card bg-light mb-3 book_card" style="background-color: transparent;opacity: 0.87;" >
+						<div class="card-header">
+							<h5><a href="{{ url_for('book', book_id=book.id) }} ">
+								{{ book.title }}
+							</a></h5>
+						</div>
+						<div class="card-body">
+						    <h6 class="card-title">ISBN ID : {{ book.isbn }}</h6>
+						    <p class="card-text">Author: {{ book.name }} </p>
+						    <p class="card-text">Year Published : {{ book.year }} </p>
+						</div>
+					</div>
+					</div>
+					{% endfor %}
+					</div>
+  				</div>
+  			</div>
+  		</div>
+  	</section>
+
+{% endblock %}

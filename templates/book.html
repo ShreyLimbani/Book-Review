@@ -1,0 +1,87 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+	{{ book.title }}
+{% endblock %}
+
+{% block css %}
+	body{
+		background-image: url('../static/img/dashboard.jpg');
+	}
+{% endblock %}
+
+{% block body %}
+	<div>
+		<div class="jumbotron" style="opacity: 0.85">
+			<h1 class="display-3">{{ book['details'].title }}</h1>
+			<p class="lead">This is a book written by {{ book['details'].name }}.</p>
+			<hr class="my-4">
+			<div class="row" style="font-size: 20px;">
+				<div class="col-7">
+					<p><b>ISBN:</b> {{ book['details'].isbn }}</p>
+					<p><b>Author:</b> {{ book['details'].name }}</p>
+					<p><b>Year:</b> {{ book['details'].year }}</p>
+				</div>
+				<div class="col">
+					<h3 class="display-5">Goodreads Ratings</h3>
+					{% if book['goodreads'] == 'None' %}
+					<p> Data not available </p>
+					{% else %}
+					<p> Average Rating - {{ book['goodreads'][0] }} &#9733;</p>
+					<p> Number of Ratings - {{ book['goodreads'][1] }}</p>
+					{% endif %}
+				</div>
+			</div>
+			<hr class="my-4">
+			<div class="row" style="font-size: 20px;">
+				<div class="col-7">
+					<h3 class="display-5">Reviews on Book Reviews</h3>
+					{% if book['reviews'] == 'None' %}
+					<p> Be the first one to review it. 😎 </p>
+					{% else %}
+						<br/>
+						<h5> Avg. Rating: {{book['stat'].round}}<br/>Total Rating: {{book['stat'].count}}</h5>
+						{% for review in book['reviews'] %}
+						<hr class="my-4">
+							<p><b>Username:</b> {{ review.name }}</p>
+							<p><b>Rating:</b> {{ review.rating }}/5 &#9733;</p>
+							<p><b>Review:</b> {{ review.review }} </p>
+						{% endfor %}
+					{% endif %}
+				</div>
+				<div class="col-1"></div>
+				<div class="col">
+					<h3 class="display-5">Your Review</h3>
+					{% if book['yourReview'] == 'None' %}
+					<form action="{{ url_for('postReview', book_id=book['details'].id ) }} " method="post">
+						<div class="form-group">
+							<label>Rating</label><br/>
+							<div class="row">
+								<div class="col-1">1&#9733;</div>
+							<div class="col-5"><input class="form-control-range" type="range" min="1" max="5" step="1" name="rating" id="formControlRange" placeholder="2"></div>
+								<div class="col-1">5&#9733;</div>
+							</div>
+							<br/>
+							<label>Review</label><br/>
+							<div class="row">
+								<div class="col-8">
+									<textarea name="review" class="form-control-range" placeholder="Type in your review" cols="60" rows="6"></textarea>
+								</div>
+							</div>
+							<br/>
+							<div class="form-group">
+						  		<button type="submit" class="btn btn-primary">Submit
+						  		</button>
+						  	</div>
+						</div>
+					</form>
+					{% else %}
+					<br/>
+					<p><b>Rating:</b> {{book['yourReview'].rating}}/5 &#9733;</p>
+					<p><b>Review:</b> {{book['yourReview'].review}} </p>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

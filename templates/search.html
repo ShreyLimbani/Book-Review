@@ -1,0 +1,50 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+	Search-'{{search_string}}'
+{% endblock %}
+
+{% block css %}
+	body{
+		background-image: url('../static/img/dashboard.jpg');
+	}
+{% endblock %}
+
+{% block body %}
+	<section>
+		<div>
+		<div class="jumbotron" style="opacity: 0.85">
+			<h2 class="display-4"> Search - '{{ search_string }}' </h2>
+			<p class="lead"> {{ count }} Results Obtained.</p>
+			<hr class="my-4">
+			<div class="row" style="font-size: 20px;">
+			{% for result in query %}
+			<div class="col-4">
+				<div class="alert alert-dark" role="alert">
+					<h4 class="alert-heading">
+						<a href="{{ url_for('book', book_id=result.id) }}">
+						{{result.title}}
+						</a>
+					</h4>
+					<p>ISBN: {{result.isbn}}</p>
+					<p>Author: {{result.name}} </p>
+				</div>
+			</div>
+			{% else %}
+			<div class="col-8">
+				<div class="alert alert-danger" role="alert" style="color: #0b4f1d">
+				<br/>
+				Your search - {{search_string}} - did not match any books, authors or isbn.<br/><br/>
+				Suggestions:<br/>
+				<br/>
+				Make sure that all words are spelled correctly.<br/>
+				Try different keywords.<br/>
+				Try more general keywords. <br/>
+				</div>
+			</div>
+			{% endfor %}
+			</div>
+		</div>
+	</div>
+	</section>
+{% endblock %}

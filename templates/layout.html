@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{% block title %}{% endblock %}</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+	<style type="text/css">
+		body{
+		background-image: url('static/img/dashboard.jpg');
+		background-size: 100%;
+		background-attachment: fixed;
+	}
+		{% block css %}
+		{% endblock %}
+	</style>
+</head>
+<body>
+	{% if index is not defined %}
+		<nav class="navbar sticky-top navbar-expand-lg navbar-dark dark scrolling-navbar" style="background-color: black; padding: 8px;">
+		    <div class="container">
+		      <!-- Brand -->
+		      <a class="navbar-brand" href=" {{ url_for('login') }}">
+		        <strong>Book Reviews</strong>
+		      </a>
+
+		      <!-- Collapse -->
+		      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+		        <span class="navbar-toggler-icon"></span>
+		      </button>
+		      <!--- Links -->
+		      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+		        <!-- Left -->
+		        <ul class="navbar-nav mr-auto">
+		          <li class="nav-item">   
+		          </li>
+		        </ul>
+		        <form class="form-row my-12 my-lg-0" action="{{ url_for('search') }} " method="POST">
+			    	<div class="col">
+			    	<input class="form-control mr-lg-2" type="text" placeholder="Search ISBN,Author,Title" aria-label="Search" name="search_string">
+			    	</div>
+			    	<button class="btn btn-success my-2 my-sm-0" type="submit">Search</button>
+				</form>
+			  	<ul class="navbar-nav mr-auto">
+		          <li class="nav-item">   
+		          </li>
+		        </ul>
+		        <!-- Right -->
+		        <ul class="navbar-nav nav-flex-icons">
+		          <li class="nav-item mr-4">
+		            <form action=" {{ url_for('index') }}" method="post">
+		              <button type="submit" class="btn-sm btn-success nav-link border border-light rounded" name="logout">
+		                <i class="fas fa-user mr-2"></i><span style="color: White">{{name}}, Logout</span>
+		              </button>
+		            </form>
+		          </li>
+		        </ul>
+		      </div>
+		    </div>
+	  	</nav>
+	{% endif %}
+	<container>		
+	{% block body %}
+	{% endblock %}
+	</container>
+</body>
+</html>

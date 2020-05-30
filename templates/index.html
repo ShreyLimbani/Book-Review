@@ -1,0 +1,116 @@
+{% extends 'layout.html' %}
+{% block title %}
+	Index Page
+{% endblock %}
+
+{% block css %}
+	#registerform{
+		margin:6px;
+		padding : 6px;
+	}
+	#loginform{
+		margin:6px;
+		padding : 6px;
+		
+	}
+	.inputLabel{
+	font-size: 20px;
+	}
+
+	body{
+		background-image: url('static/img/index.jpg');
+	}
+
+	#indexCard{
+	background-image: url('static/img/index.jpg');
+	background-size: 100%;
+	}
+
+	.inputLabel{
+		color: #4ceb34;
+	}
+{% endblock %}
+
+{% block body %}
+	<header >
+		<nav class="navbar navbar-dark" style="background-color: #384541;">
+			<div class="container" style="background-color: #384541;">
+				<div class="row">
+					<div class="col">
+					<!-- As a heading -->
+					</div>
+						<!-- As a heading -->
+					<div class="col-10">
+						<span class="navbar-brand mb-0 h1" style="font-size: 30px">Book Reviews</span>
+					</div>
+				</div>
+			</div>
+		</nav>
+	</header>
+	<section>
+		<div class="card">
+			<div class="card-body" id="indexCard">
+				<div class="row">
+					<div class="col-1">
+					</div>
+					<div class="col-md-3 ml-lg-4 ml-md-2" id="registerform">
+						<div class="card bg-dark mb-3  text-center" style="opacity: 0.85">
+						<form action="{{ url_for('login') }}" method="post">
+						  <div class="form-group card-header">
+						  	<h3 style="color: #4ceb34; text-align: center;">Sign Up</h3>
+						  </div>
+						  <div class="card-body">
+						  <div class="form-group">
+						    <label for="exampleInputEmail1" class="inputLabel">Full Name</label>
+						    <input type="text" class="form-control" name="name">
+						  </div>				
+						  <div class="form-group">
+						    <label for="exampleInputEmail1" class="inputLabel">Username</label>
+						    <input type="text" class="form-control" name="username">
+						  </div>
+						  <div class="form-group">
+						    <label for="exampleInputPassword1" class="inputLabel">Password</label>
+						    <input type="password" class="form-control" name="password">
+						  </div>
+						  <div class="form-group">
+						    <label class="inputLabel">Date Of Birth</label><br/>
+						    <input type="date" class="form-control" style="text-align:center;"name="dob">
+						  </div>
+						  	<button type="submit" class="btn btn-primary" name="form" value="register">Register</button>
+						</div>
+						</form>
+						</div>
+					</div>
+					<div class="col-1"></div>
+					<div class="col-1"  style="border-right: 2px solid #4ceb34"></div>
+					<div class="col-1"></div>
+					<div class="col-3" id="loginform" style="color: #4ceb34">
+						<div class="card bg-dark mb-3 text-center" style="opacity: 0.85">
+						<form action="{{ url_for('login') }}" method="post" name="user">
+						  <div class="form-group card-header">
+						  	<h3 style="color: #4ceb34;">Sign In</h3>
+						  </div>
+						  <div class="card-body">
+						  <div class="form-group col-7">
+						    <label for="exampleInputEmail1" class="inputLabel"></label>
+						  </div>
+						  <div class="form-group">
+						    <label for="exampleInputEmail1" class="inputLabel">Username</label>
+						    <input type="text" class="form-control" name="username">
+						  </div>
+						  <div class="form-group">
+						    <label for="exampleInputPassword1" class="inputLabel">Password</label>
+						    <input type="password" class="form-control" name="password">
+						  </div>
+						  <div class="form-group">
+						  	<button type="submit" class="btn btn-primary" name="form" value="login">Login</button>
+						  </div>
+						</div>
+						</form>
+					</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+{% endblock %}
