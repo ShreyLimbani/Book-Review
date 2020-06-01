@@ -50,12 +50,22 @@
 	<section>
 		<div class="card">
 			<div class="card-body" id="indexCard">
+				{% if message is defined %}
+				<div class="row">
+					<div class="col-2"></div>
+					<div class="col-8">
+						<div class="alert alert-success" role="alert">
+						  {{message}}
+						</div>
+					</div>
+				</div>
+				{% endif %}
 				<div class="row">
 					<div class="col-1">
 					</div>
 					<div class="col-md-3 ml-lg-4 ml-md-2" id="registerform">
 						<div class="card bg-dark mb-3  text-center" style="opacity: 0.85">
-						<form action="{{ url_for('login') }}" method="post">
+						<form action="{{ url_for('register') }}" method="post">
 						  <div class="form-group card-header">
 						  	<h3 style="color: #4ceb34; text-align: center;">Sign Up</h3>
 						  </div>
@@ -76,7 +86,7 @@
 						    <label class="inputLabel">Date Of Birth</label><br/>
 						    <input type="date" class="form-control" style="text-align:center;"name="dob">
 						  </div>
-						  	<button type="submit" class="btn btn-primary" name="form" value="register">Register</button>
+						  	<button type="submit" class="btn btn-primary">Register</button>
 						</div>
 						</form>
 						</div>
@@ -86,7 +96,7 @@
 					<div class="col-1"></div>
 					<div class="col-3" id="loginform" style="color: #4ceb34">
 						<div class="card bg-dark mb-3 text-center" style="opacity: 0.85">
-						<form action="{{ url_for('login') }}" method="post" name="user">
+						<form action="{{ url_for('login') }}" method="post">
 						  <div class="form-group card-header">
 						  	<h3 style="color: #4ceb34;">Sign In</h3>
 						  </div>
@@ -103,7 +113,7 @@
 						    <input type="password" class="form-control" name="password">
 						  </div>
 						  <div class="form-group">
-						  	<button type="submit" class="btn btn-primary" name="form" value="login">Login</button>
+						  	<button type="submit" class="btn btn-primary">Login</button>
 						  </div>
 						</div>
 						</form>

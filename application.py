@@ -1,6 +1,6 @@
 import os
 import requests, json
-from flask import Flask, session, render_template, request, url_for, redirect
+from flask import Flask, session, render_template, request, url_for, redirect, jsonify
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -24,6 +24,23 @@ engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 Session(app)
 
+
+# For serialize decimal through json
+from decimal import Decimal
+
+class fakefloat(float):
+    def __init__(self, value):
+        self._value = value
+    def __repr__(self):
+        return str(self._value)
+
+def defaultencode(o):
+    if isinstance(o, Decimal):
+        # Subclass float with custom repr?
+        return fakefloat(o)
+    raise TypeError(repr(o) + " is not JSON serializable")
+
+
 @app.route("/",methods=["GET","POST"])
 def index():
 	if request.method == "POST":
@@ -36,63 +53,78 @@ def index():
 		else:
 			return redirect(url_for('login'))
 
-@app.route("/dashboard", methods=["GET","POST"])
+@app.route("/register", methods=["POST"])
+def register():
+	username = request.form.get("username")
+	password = request.form.get("password")
+	name = request.form.get("name")	
+	dob = request.form.get("dob")
+	if password=='' or username=='':
+		message = "Retry with proper username and password"
+
+	elif db.execute("SELECT * FROM users WHERE username = :username", {"username": username}).rowcount == 1:
+		message = "Username not available. Try again with another one."
+
+	else:
+		db.execute("INSERT INTO users (username, name, password, dateOfBirth) VALUES (:username, :name, :password, :dob)",
+		{"username":username,"name": name,"password": password,"dob": dob})
+		db.commit()
+		message = "New User registered. Now Sign In with the same username!!"
+		
+	return render_template('index.html', index=True, message = message)
+
+
+@app.route("/login", methods=["GET","POST"])
 def login():
-	books = db.execute("SELECT books.id,isbn,title,authors.name,year FROM books join authors on books.author_id=authors.id order by random() limit 21;")
 	if request.method == "GET":
 		if session.get("user_id")==None:
 			#For opening the login page form
 			return redirect(url_for('index'))
 		else:		
-			#yourBooks_id_res = db.execute("SELECT book_id from book_ratings WHERE user_id= :u_id",
-			#					{'u_id': session["user_id"]})
-			#yourBooks_id = []
-			#for y_b in yourBooks_id_res:
-			#	yourBooks_id.append(y_b.book_id)
-			#print("---Hello EveryOne---(())"+str(yourBooks_id))
 
-			return render_template('dashboard.html', name=session["name"], books=books)
+			return redirect(url_for('dashboard'))
+
 	
 	else:
 	#For logging into to the account or creating a new user account	
-		form_type = request.form.get("form")
 		username = request.form.get("username")
 		password = request.form.get("password")
+		message = "Retry with proper username and password"
 		if password=='' or username=='':
-			return "Retry with proper username and password"
+			return render_template('index.html', index=True, message = message)
 
-		if form_type == 'register':
-			name = request.form.get("name")	
-			dob = request.form.get("dob")
-			if db.execute("SELECT * FROM users WHERE username = :username", {"username": username}).rowcount == 1:
-				return "Try again with another username...!!"
+		try:
+			user = db.execute("SELECT * FROM users WHERE username = :username and password=	:password", 
+			{"username": username, "password": password}).fetchall()
+			session["user_id"] = user[0].id
+			session["name"] = user[0].name
+		except:
+			return render_template('index.html', index=True, message = message)
+		if len(user) == 0:
+			return "No user found .../n Try registering for a new user"
+	
+		return redirect(url_for('dashboard'))
 
-			db.execute("INSERT INTO users (username, name, password, dateOfBirth) VALUES (:username, :name, :password, :dob)",
-				{"username":username,"name": name,"password": password,"dob": dob})
-			db.commit()
-			session["name"] = name
-			session["user_id"] = db.execute("SELECT * FROM users WHERE username = :username", {"username": username}).first().id
-			return render_template("dashboard.html", name=name, books =books, index=False) # 
-		
-		else:
-			try:
-				user = db.execute("SELECT * FROM users WHERE username = :username and password=	:password", 
-				{"username": username, "password": password}).fetchall()
-				session["user_id"] = user[0].id
-				session["name"] = user[0].name
-			except:
-				return "Retry with proper username and password"
-			if len(user) == 0:
-				return "No user found .../n Try registering for a new user"
+@app.route("/dashboard")
+def dashboard():
+	books = db.execute("SELECT books.id,isbn,title,authors.name,year FROM books join authors on books.author_id=authors.id order by random() limit 21;")
+	
+	#Books Reviewed By the User
+	userBooks_id_res = db.execute("SELECT book_id from book_ratings WHERE user_id= :u_id",
+						{'u_id': session["user_id"]}).fetchall()
 
-			#yourBooks_id_res = db.execute("SELECT book_id from book_ratings WHERE user_id= :u_id",
-			#					{'u_id': session["user_id"]})
-			#yourBooks_id = []
-			#for y_b in yourBooks_id_res:
-			#	yourBooks_id.append(y_b.book_id)
-			#print("---Hello EveryOne---(())"+str(yourBooks_id))
-			
-			return render_template("dashboard.html", name=session["name"], books = books) #
+	userBooks_id = []
+	for book in userBooks_id_res:
+		userBooks_id.append(book.book_id)
+	userBooks_id = tuple(userBooks_id)
+	if len(userBooks_id)==0:
+		userBooks="None"
+	else:		
+		userBooks = db.execute("SELECT books.id,isbn,title,authors.name,year FROM books join authors on books.author_id=authors.id where books.id in :userBooks_id limit 7;",
+						{'userBooks_id': userBooks_id}).fetchall()
+
+	return render_template('dashboard.html', name=session["name"], books=books, userBooks= userBooks)
+
 
 @app.route("/books/<int:book_id>")
 def book(book_id):
@@ -122,13 +154,13 @@ def book(book_id):
 	if len(reviews) == 0:
 		reviews = "None"
 	#Getting Rev
-	book = {'details': book_details, 'goodreads':goodreads, 'reviews': reviews, 'stat': stat.first(), 'yourReview': 'None'}
+	book = {'details': book_details, 'goodreads':goodreads, 'reviews': reviews, 'stat': stat.first(), 'userReview': 'None'}
 
 	#Checking if user has reviewed the book.
 	if reviews != "None":
 		for review in reviews:
 			if review.id==session["user_id"]:
-				book['yourReview'] = review
+				book['userReview'] = review
 				try:
 					reviews.remove(review)
 				except:
@@ -159,7 +191,6 @@ def search():
 	s2 = '%'+search_string.capitalize()+'%'
 	s3 = '%'+search_string.upper()+'%'
 	s = '%'+search_string+'%'
-	print(f"s-{s}--------s1-{s1}--------s2-{s2}--------s3-{s3}")
 	try:
 		query = db.execute("SELECT books.id, isbn, title, name FROM BOOKS join authors on books.author_id=authors.id WHERE ISBN like :s3 or title like :s2 or title like :s1 or title like :s or name like :s1 or name like :s2 or name like :s order by title",
 						{'s3': s3, 's2': s2, 's1': s1, 's': s}).fetchall()
@@ -169,3 +200,26 @@ def search():
 		count = len(query)
 
 	return render_template('search.html',name=session["name"], search_string=search_string, query=query, count=count)
+
+@app.route("/api/<string:isbn>", methods=["GET"])
+def books_api(isbn):
+
+	book = db.execute("SELECT books.id, title, year, isbn, name FROM BOOKS left JOIN AUTHORS ON BOOKS.author_id=authors.id where books.isbn= :isbn",
+						{'isbn': isbn}).fetchone()
+	if book is None:
+		return jsonify({"error":"Invalid book isbn"}), 404
+	reviews = db.execute("SELECT round(avg(rating),2), count(*) FROM book_ratings where book_id= :book_id",{'book_id':book.id}).fetchone()
+	if reviews.round is None:
+		avg=Decimal('0.00')
+	else:
+		avg = Decimal(str(reviews.round))
+
+	details={
+		    "title": book.title,
+		    "author": book.name,
+		    "year": book.year,
+		    "isbn": book.isbn,
+		    "review_count": reviews.count,
+		    "average_score": avg
+		}
+	return json.dumps(details, default = defaultencode)

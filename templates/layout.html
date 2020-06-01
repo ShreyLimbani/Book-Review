@@ -9,6 +9,9 @@
 		background-size: 100%;
 		background-attachment: fixed;
 	}
+	a{ color: #07b846; }
+	a:hover{ color: #00ffbf; }
+	#userbook_header{ color: #d5edbe; }
 		{% block css %}
 		{% endblock %}
 	</style>
@@ -18,7 +21,7 @@
 		<nav class="navbar sticky-top navbar-expand-lg navbar-dark dark scrolling-navbar" style="background-color: black; padding: 8px;">
 		    <div class="container">
 		      <!-- Brand -->
-		      <a class="navbar-brand" href=" {{ url_for('login') }}">
+		      <a class="navbar-brand" href=" {{ url_for('dashboard') }}">
 		        <strong>Book Reviews</strong>
 		      </a>
 

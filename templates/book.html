@@ -52,7 +52,7 @@
 				<div class="col-1"></div>
 				<div class="col">
 					<h3 class="display-5">Your Review</h3>
-					{% if book['yourReview'] == 'None' %}
+					{% if book['userReview'] == 'None' %}
 					<form action="{{ url_for('postReview', book_id=book['details'].id ) }} " method="post">
 						<div class="form-group">
 							<label>Rating</label><br/>
@@ -77,8 +77,8 @@
 					</form>
 					{% else %}
 					<br/>
-					<p><b>Rating:</b> {{book['yourReview'].rating}}/5 &#9733;</p>
-					<p><b>Review:</b> {{book['yourReview'].review}} </p>
+					<p><b>Rating:</b> {{book['userReview'].rating}}/5 &#9733;</p>
+					<p><b>Review:</b> {{book['userReview'].review}} </p>
 					{% endif %}
 				</div>
 			</div>
